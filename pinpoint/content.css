@@ -1,0 +1,530 @@
+/* =========================================================
+   Pinpoint — styles
+   Every rule is anchored to one of our own ids / classes so
+   nothing leaks into the sites this runs on.
+   ========================================================= */
+
+:root {
+  --pp-accent: #ffd600;
+  --pp-accent-soft: #ffe97a;
+  --pp-accent-deep: #ff9100;
+  --pp-glass: rgba(24, 24, 27, 0.82);
+  --pp-solid: rgba(24, 24, 27, 0.97);
+  --pp-border: rgba(255, 255, 255, 0.13);
+  --pp-font: 'Roboto', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --pp-mono: ui-monospace, 'SF Mono', Consolas, monospace;
+}
+
+#pp-layer, #pp-layer *,
+#yt-pin-sidebar, #yt-pin-sidebar *,
+#pp-editor, #pp-editor *,
+#pp-tip, #pp-tip * {
+  box-sizing: border-box;
+}
+
+/* ---------------- YouTube: pin button in the controls ---------------- */
+
+#pin-moment-btn {
+  opacity: 0.92;
+  transition: opacity 0.15s ease;
+}
+#pin-moment-btn svg {
+  display: block;
+  overflow: visible;
+  filter: drop-shadow(0 0 3px rgba(255, 214, 0, 0.4));
+  transition: transform 0.2s cubic-bezier(0.3, 1.6, 0.5, 1), filter 0.2s ease;
+}
+#pin-moment-btn:hover { opacity: 1; }
+#pin-moment-btn:hover svg {
+  transform: translateY(-1px) scale(1.12) rotate(-8deg);
+  filter: drop-shadow(0 0 6px rgba(255, 214, 0, 0.85));
+}
+#pin-moment-btn.yt-pin-pop svg,
+#pp-layer .pp-add.yt-pin-pop svg {
+  animation: yt-pin-pop 0.45s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+@keyframes yt-pin-pop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.35) rotate(-14deg); }
+  100% { transform: scale(1); }
+}
+
+/* ---------------- Dots on the bar ---------------- */
+/* Each dot is centred on the bar (top: 50%) so it sits ON the line, whatever
+   height the site gives the bar. The 20px box is just a roomy click target. */
+
+.yt-pin-marker {
+  position: absolute;
+  top: 50%;
+  width: 20px;
+  height: 20px;
+  transform: translate(-50%, -50%);
+  background: transparent;
+  cursor: pointer;
+  z-index: 50;
+  transition: opacity 0.3s ease;
+}
+.yt-pin-marker::before {            /* soft glow */
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 214, 0, 0.5), rgba(255, 214, 0, 0) 70%);
+  pointer-events: none;
+}
+.yt-pin-marker::after {             /* the dot */
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff6b0, var(--pp-accent) 55%, var(--pp-accent-deep));
+  border: 1.5px solid rgba(0, 0, 0, 0.7);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6), 0 0 8px rgba(255, 214, 0, 0.7);
+  transition: transform 0.18s cubic-bezier(0.3, 1.6, 0.5, 1);
+  pointer-events: none;
+}
+.yt-pin-marker:hover::after,
+.yt-pin-marker.yt-pin-hot::after {
+  transform: translate(-50%, -50%) scale(1.45);
+}
+.yt-pin-marker.yt-pin-active::after {
+  animation: yt-pin-pulse 1.8s ease-out infinite;
+}
+@keyframes yt-pin-pulse {
+  0%   { box-shadow: 0 1px 4px rgba(0,0,0,.6), 0 0 0 0 rgba(255, 214, 0, 0.7); }
+  70%  { box-shadow: 0 1px 4px rgba(0,0,0,.6), 0 0 0 9px rgba(255, 214, 0, 0); }
+  100% { box-shadow: 0 1px 4px rgba(0,0,0,.6), 0 0 0 0 rgba(255, 214, 0, 0); }
+}
+
+/* While our title bubble is up, hide YouTube's own hover preview so the two don't collide */
+html.pp-tip-on .ytp-tooltip {
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* YouTube fullscreen: fade our extras out together with the controls */
+html.pp-ui-hidden .yt-pin-marker,
+html.pp-ui-hidden #yt-pin-sidebar {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* ---------------- Hover title bubble ---------------- */
+
+#pp-tip {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 2147483647;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: min(340px, calc(100vw - 16px));
+  padding: 7px 12px;
+  border-radius: 11px;
+  background: var(--pp-solid);
+  border: 1px solid var(--pp-border);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font: 500 13px/1.25 var(--pp-font);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, calc(-100% + 4px));
+  transition: opacity 0.12s ease, transform 0.12s ease;
+}
+#pp-tip.pp-show {
+  opacity: 1;
+  transform: translate(-50%, -100%);
+}
+#pp-tip::after {                    /* arrow pointing at the dot */
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: var(--pp-ax, 50%);
+  width: 9px;
+  height: 9px;
+  transform: translate(-50%, -50%) rotate(45deg);
+  background: var(--pp-solid);
+  border-right: 1px solid var(--pp-border);
+  border-bottom: 1px solid var(--pp-border);
+}
+#pp-tip .pp-tip-time {
+  flex: none;
+  color: var(--pp-accent);
+  font-family: var(--pp-mono);
+  font-weight: 600;
+}
+#pp-tip .pp-tip-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------------- Pin list (sidebar) ---------------- */
+
+#yt-pin-sidebar {
+  position: fixed;
+  right: 16px;
+  bottom: clamp(160px, 26vh, 320px);   /* high enough to stay clear of the player's side options */
+  width: 260px;
+  max-height: 340px;
+  overflow-y: auto;
+  padding: 12px;
+  border-radius: 16px;
+  color: #f1f1f1;
+  font: 13px/1.35 var(--pp-font);
+  text-align: left;
+  background: var(--pp-glass);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid var(--pp-border);
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  z-index: 2147483646;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  animation: yt-pin-in 0.35s cubic-bezier(0.2, 0.9, 0.3, 1);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+}
+#yt-pin-sidebar::-webkit-scrollbar { width: 6px; }
+#yt-pin-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 6px;
+}
+@keyframes yt-pin-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.97); }
+  to   { opacity: 1; transform: none; }
+}
+#yt-pin-sidebar.yt-pin-hidden {
+  opacity: 0;
+  transform: translateY(6px);
+  pointer-events: none;
+}
+
+#yt-pin-sidebar .yt-pin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 10px;
+  padding: 0 0 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+#yt-pin-sidebar .yt-pin-title { display: flex; align-items: center; gap: 7px; }
+#yt-pin-sidebar .yt-pin-title svg { filter: drop-shadow(0 0 4px rgba(255, 214, 0, 0.6)); }
+#yt-pin-sidebar .yt-pin-right { display: flex; align-items: center; gap: 6px; }
+#yt-pin-sidebar .yt-pin-count {
+  min-width: 20px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(255, 214, 0, 0.16);
+  color: var(--pp-accent);
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 0;
+}
+#yt-pin-sidebar .pp-close {
+  display: none;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #aaa;
+  font: 16px/1 var(--pp-font);
+  cursor: pointer;
+}
+#yt-pin-sidebar .pp-close:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
+
+#yt-pin-sidebar #yt-pin-list { list-style: none; padding: 0; margin: 0; }
+#yt-pin-sidebar #yt-pin-list li {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 3px;
+  padding: 7px 8px 7px 10px;
+  border-radius: 10px;
+  transition: background 0.15s ease;
+}
+#yt-pin-sidebar #yt-pin-list li::before {   /* accent bar on the active pin */
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, var(--pp-accent-soft), var(--pp-accent-deep));
+  opacity: 0;
+  transform: scaleY(0.4);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+#yt-pin-sidebar #yt-pin-list li:hover { background: rgba(255, 255, 255, 0.07); }
+#yt-pin-sidebar #yt-pin-list li.yt-pin-active { background: rgba(255, 214, 0, 0.1); }
+#yt-pin-sidebar #yt-pin-list li.yt-pin-active::before { opacity: 1; transform: scaleY(1); }
+
+#yt-pin-sidebar .yt-pin-time {
+  flex: none;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(255, 214, 0, 0.14);
+  color: var(--pp-accent);
+  font-family: var(--pp-mono);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+#yt-pin-sidebar .yt-pin-time:hover { background: var(--pp-accent); color: #111; }
+#yt-pin-sidebar .yt-pin-label {
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#yt-pin-sidebar .yt-pin-del {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #999;
+  font: 16px/1 var(--pp-font);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+#yt-pin-sidebar #yt-pin-list li:hover .yt-pin-del { opacity: 1; }
+#yt-pin-sidebar .yt-pin-del:hover { background: rgba(255, 68, 68, 0.18); color: #ff5c5c; }
+
+#yt-pin-sidebar #yt-pin-list li.yt-pin-empty {
+  display: block;
+  padding: 14px 6px;
+  color: #a0a0a0;
+  text-align: center;
+  font-size: 12.5px;
+}
+#yt-pin-sidebar #yt-pin-list li.yt-pin-empty:hover { background: transparent; }
+
+/* ---------------- Title box (replaces the old browser prompt) ---------------- */
+
+#pp-editor {
+  position: fixed;
+  left: 50%;
+  bottom: 96px;
+  width: min(340px, calc(100vw - 24px));
+  padding: 12px;
+  border-radius: 16px;
+  color: #f1f1f1;
+  font: 13px/1.35 var(--pp-font);
+  text-align: left;
+  background: var(--pp-glass);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid var(--pp-border);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  z-index: 2147483647;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 8px) scale(0.98);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+#pp-editor.pp-open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, 0) scale(1);
+}
+#pp-editor .pp-ed-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+#pp-editor .pp-ed-head svg { filter: drop-shadow(0 0 4px rgba(255, 214, 0, 0.6)); }
+#pp-editor .pp-ed-time {
+  margin-left: auto;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(255, 214, 0, 0.14);
+  color: var(--pp-accent);
+  font-family: var(--pp-mono);
+  font-size: 12px;
+  font-weight: 600;
+}
+#pp-editor .pp-ed-input {
+  display: block;
+  width: 100%;
+  height: 38px;
+  margin: 0;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 10px;
+  outline: none;
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  font: 14px/1 var(--pp-font);
+  box-shadow: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+#pp-editor .pp-ed-input::placeholder { color: #8d8d92; }
+#pp-editor .pp-ed-input:focus {
+  border-color: var(--pp-accent);
+  box-shadow: 0 0 0 3px rgba(255, 214, 0, 0.18);
+}
+#pp-editor .pp-ed-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+#pp-editor .pp-ed-hint {
+  flex: 1;
+  color: #8d8d92;
+  font-size: 11.5px;
+}
+#pp-editor .pp-ed-cancel,
+#pp-editor .pp-ed-save {
+  height: 30px;
+  margin: 0;
+  padding: 0 14px;
+  border: none;
+  border-radius: 8px;
+  font: 600 12.5px/1 var(--pp-font);
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+#pp-editor .pp-ed-cancel { background: rgba(255, 255, 255, 0.09); color: #ddd; }
+#pp-editor .pp-ed-cancel:hover { background: rgba(255, 255, 255, 0.16); }
+#pp-editor .pp-ed-save {
+  background: linear-gradient(180deg, var(--pp-accent-soft), var(--pp-accent) 55%, var(--pp-accent-deep));
+  color: #1a1400;
+}
+#pp-editor .pp-ed-save:hover { filter: brightness(1.06); }
+#pp-editor .pp-ed-save:active { transform: scale(0.97); }
+
+/* ---------------- Any-site overlay (non-YouTube videos) ---------------- */
+
+#pp-layer {
+  position: fixed;
+  z-index: 2147483646;
+  pointer-events: none;
+  overflow: visible;
+  font: 13px/1.35 var(--pp-font);
+  color: #f1f1f1;
+}
+
+#pp-layer .pp-toolbar {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+#pp-layer.pp-awake .pp-toolbar {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+#pp-layer .pp-fab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--pp-border);
+  border-radius: 50%;
+  background: var(--pp-glass);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  color: #eee;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+#pp-layer .pp-fab:hover {
+  transform: scale(1.08);
+  background: rgba(40, 40, 46, 0.92);
+  box-shadow: 0 4px 18px rgba(255, 214, 0, 0.28);
+}
+#pp-layer .pp-fab svg { display: block; overflow: visible; filter: drop-shadow(0 0 3px rgba(255, 214, 0, 0.45)); }
+#pp-layer .pp-list-btn svg { filter: none; }
+#pp-layer .pp-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--pp-accent);
+  color: #1a1400;
+  font: 700 10.5px/17px var(--pp-font);
+  text-align: center;
+}
+
+/* thin strip along the bottom of the video that carries the dots */
+#pp-layer .pp-track {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 12px;
+  height: 4px;
+  border-radius: 4px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+#pp-layer .pp-track.pp-has-pins {
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+}
+#pp-layer.pp-awake .pp-track { opacity: 1; }
+#pp-layer .yt-pin-marker { pointer-events: none; }
+#pp-layer.pp-awake .yt-pin-marker { pointer-events: auto; }
+
+/* the pin list and title box live inside the overlay on other sites */
+#pp-layer #yt-pin-sidebar {
+  position: absolute;
+  right: 12px;
+  bottom: 40px;
+  width: min(260px, calc(100% - 24px));
+  max-height: calc(100% - 110px);
+  animation: none;
+}
+#pp-layer #yt-pin-sidebar .pp-close { display: block; }
+#pp-layer #yt-pin-sidebar.pp-open { pointer-events: auto; }
+#pp-layer #yt-pin-sidebar:not(.pp-open) {
+  opacity: 0;
+  transform: translateY(6px);
+  pointer-events: none;
+}
+#pp-layer #pp-editor {
+  position: absolute;
+  bottom: 40px;
+  width: min(340px, calc(100% - 24px));
+}

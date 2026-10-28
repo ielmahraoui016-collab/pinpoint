@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Pinpoint",
+  "version": "1.2",
+  "description": "Pin the exact moments you care about in any online video, with titles, glowing dots on the bar and a jump-to list.",
+  "permissions": ["storage"],
+  "host_permissions": ["<all_urls>"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "all_frames": true,
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  }
+}
