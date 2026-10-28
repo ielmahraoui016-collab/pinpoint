@@ -26,3 +26,6 @@ Personally, it helped me a lot when I'm studying on YouTube and want to pin a mo
 | Key | Action |
 | --- | ------ |
 | **P** | Pin the current moment |
+
+
+coded this with claude while studying btw
