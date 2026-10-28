@@ -14,7 +14,7 @@ Personally, it helped me a lot when I'm studying on YouTube and want to pin a mo
 
 ## How to install
 
-1. Download the files: [**Download Pinpoint (ZIP)**](https://github.com/YOUR-USERNAME/YOUR-REPO/archive/refs/heads/main.zip)
+1. Download the files: [**Download Pinpoint (ZIP)**](https://github.com/ielmahraoui016-collab/pinpoint/archive/refs/heads/main.zip)
 2. Unzip it. You'll get a folder with the files inside. Don't change the file names or format.
 3. Go to your browser's extensions page (`chrome://extensions`, or `brave://extensions` in Brave).
 4. Turn on **Developer mode**.
